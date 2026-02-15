@@ -1,8 +1,10 @@
 local M = {}
 
 local defaults = {
-	darken_factor = 0.5,
-	brighten_factor = 0,
+	factor = 1.0,
+	step = 0.05,
+	min_factor = 0.1,
+	max_factor = 3.0,
 }
 
 M.config = {}
@@ -15,11 +17,14 @@ function M.setup(opts)
 end
 
 function M.validate()
-	if M.config.darken_factor < 0 or M.config.darken_factor > 1 then
-		error("numbra: darken_factor must be between 0 and 1")
+	if M.config.step <= 0 or M.config.step > 1 then
+		error("numbra: step must be between 0 and 1")
 	end
-	if M.config.brighten_factor < 0 or M.config.brighten_factor > 2 then
-		error("numbra: brighten_factor must be between 0 and 2")
+	if M.config.min_factor < 0 or M.config.min_factor >= M.config.max_factor then
+		error("numbra: min_factor must be between 0 and max_factor")
+	end
+	if M.config.max_factor <= M.config.min_factor then
+		error("numbra: max_factor must be greater than min_factor")
 	end
 end
 

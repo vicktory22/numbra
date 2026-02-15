@@ -1,10 +1,11 @@
 # Numbra
 
-A Neovim plugin that dynamically adjusts line number brightness using configurable darken and brighten factors.
+A Neovim plugin that allows manual adjustment of line number brightness through user commands.
 
 ## Features
 
-- Increase or decrease line number brightness
+- Manual control over line number brightness
+- Increase and decrease brightness with user commands
 - Works with all colorschemes (no hardcoded colors)
 - Lightweight and performant
 - Simple, unobtrusive
@@ -23,34 +24,51 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
   "vicktory22/numbra",
   config = function()
     require("numbra").setup({
-      darken_factor = 0.5,
-      brighten_factor = 0,
+      step = 0.05,
+      min_factor = 0.1,
+      max_factor = 3.0,
     })
   end,
 }
 ```
 
-Using [vim-plug](https://github.com/junegunn/vim-plug):
-
-```vim
-Plug 'vicktory22/numbra'
-```
-
 ## Usage
 
-After installation, the plugin will automatically adjust line number brightness based on configuration.
+After installation, use the provided commands to adjust line number brightness.
+
+### Commands
+
+```vim
+:NumbraIncrease  " Increase brightness by step value
+:NumbraDecrease  " Decrease brightness by step value
+:NumbraReset     " Reset to original brightness
+```
+
+### Keymap Examples
+
+Add these to your Neovim configuration:
+
+```lua
+vim.keymap.set("n", "<leader>li", ":NumbraIncrease<CR>")
+vim.keymap.set("n", "<leader>ld", ":NumbraDecrease<CR>")
+vim.keymap.set("n", "<leader>lr", ":NumbraReset<CR>")
+```
 
 ### Configuration
 
 ```lua
 require("numbra").setup({
-  -- Factor to decrease brightness (0.0 to 1.0)
-  -- 0.5 = 50% darker, 0.0 = no darkening
-  darken_factor = 0.5,
+  -- Initial brightness factor (1.0 = original colors)
+  factor = 1.0,
 
-  -- Factor to increase brightness (0.0 to 2.0)
-  -- 1.0 = 100% brighter, 0.0 = no brightening
-  brighten_factor = 0,
+  -- Step size for increase/decrease commands (0.05 = 5%)
+  step = 0.05,
+
+  -- Minimum brightness factor (0.1 = 10% brightness)
+  min_factor = 0.1,
+
+  -- Maximum brightness factor (3.0 = 300% brightness)
+  max_factor = 3.0,
 })
 ```
 
@@ -58,69 +76,76 @@ require("numbra").setup({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `darken_factor` | number | `0.5` | Factor to decrease brightness (0-1) |
-| `brighten_factor` | number | `0` | Factor to increase brightness (0-2) |
+| `factor` | number | `1.0` | Initial brightness (1.0 = original colors) |
+| `step` | number | `0.05` | Brightness change per command (0.05 = 5%) |
+| `min_factor` | number | `0.1` | Minimum allowed brightness (10%) |
+| `max_factor` | number | `3.0` | Maximum allowed brightness (300%) |
 
 ### API
 
 ```lua
--- Enable the plugin
-require("numbra").enable()
+-- Increase brightness
+require("numbra").increase()
 
--- Disable the plugin
-require("numbra").disable()
+-- Decrease brightness
+require("numbra").decrease()
 
--- Toggle on/off
-require("numbra").toggle()
+-- Reset to original brightness
+require("numbra").reset()
 
--- Check if enabled
-local enabled = require("numbra").is_enabled()
+-- Get current brightness factor
+local factor = require("numbra").get_factor()
+
+-- Set brightness factor directly
+require("numbra").set_factor(1.5)
 ```
 
 ## How It Works
 
-1. Calculates the current line number highlight color
-2. Adjusts brightness using HSL color space
+1. Caches original line number highlight colors from your colorscheme
+2. When you increase/decrease brightness, adjusts lightness using HSL color space
 3. Applies the new colors to LineNr and CursorLineNr groups
+4. Resetting restores the original colors
 
 ## Default Configuration
 
 ```lua
 {
-  darken_factor = 0.5,
-  brighten_factor = 0,
+  factor = 1.0,      -- Start with original brightness
+  step = 0.05,       -- 5% change per command
+  min_factor = 0.1,   -- 10% minimum
+  max_factor = 3.0,   -- 300% maximum
 }
 ```
 
-- **darken_factor**: Set to `0.5` to reduce line number brightness by 50%
-- **brighten_factor**: Set to `1.0` (or higher) to brighten line numbers
-
 ## Examples
 
-### Decrease brightness only
+### Fine-grained control (1% steps)
 
 ```lua
 require("numbra").setup({
-  darken_factor = 0.5,
-  brighten_factor = 0,
+  step = 0.01,
+  min_factor = 0.05,
+  max_factor = 5.0,
 })
 ```
 
-### Increase brightness only
+### Large adjustments (10% steps)
 
 ```lua
 require("numbra").setup({
-  darken_factor = 0,
-  brighten_factor = 1.0,
+  step = 0.1,
+  min_factor = 0.2,
+  max_factor = 2.0,
 })
 ```
 
-### Both decrease and increase brightness
+### Dimmer by default
 
 ```lua
 require("numbra").setup({
-  darken_factor = 0.5,
-  brighten_factor = 0.5,
+  factor = 0.8,  -- Start at 80% brightness
+  step = 0.05,
 })
 ```
 
@@ -140,7 +165,11 @@ This plugin works with any colorscheme that provides foreground colors. If you e
 
 1. Check your Neovim logs for errors
 2. Ensure your colorscheme supports line number highlights
-3. Try increasing/decreasing the factor values
+3. Try resetting with `:NumbraReset`
+
+### Brightness not changing
+
+Check current factor with `:lua print(require("numbra").get_factor())` - should return a number between your min and max values.
 
 ## License
 

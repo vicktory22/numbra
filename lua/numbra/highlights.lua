@@ -3,6 +3,7 @@ local colors = require("numbra.colors")
 local M = {}
 
 local original_colors = {}
+local current_factor = 1.0
 local groups = { "LineNr", "CursorLineNr" }
 
 local function get_hl(group)
@@ -21,7 +22,7 @@ local function get_fg(group)
 	return hl.fg
 end
 
-local function cache_original()
+function M.cache_original()
 	for _, group in ipairs(groups) do
 		if not original_colors[group] then
 			local fg = get_fg(group)
@@ -38,35 +39,33 @@ local function apply_to_group(group, factor)
 		return
 	end
 
-	local new_color = colors.adjust_brightness(original, factor)
-	if new_color then
-		vim.api.nvim_set_hl(0, group, { fg = new_color })
+	if factor == 1.0 then
+		vim.api.nvim_set_hl(0, group, { fg = original })
+	else
+		local new_color = colors.adjust_brightness(original, factor)
+		if new_color then
+			vim.api.nvim_set_hl(0, group, { fg = new_color })
+		end
 	end
 end
 
-function M.apply_to_window(winid, factor)
-	vim.api.nvim_win_call(winid, function()
-		for _, group in ipairs(groups) do
-			apply_to_group(group, factor)
-		end
-	end)
+function M.apply(factor)
+	current_factor = factor
+	for _, group in ipairs(groups) do
+		apply_to_group(group, factor)
+	end
 end
 
 function M.clear_cache()
 	original_colors = {}
 end
 
-function M.restore_all()
-	for _, group in ipairs(groups) do
-		local original = original_colors[group]
-		if original then
-			vim.api.nvim_set_hl(0, group, { fg = original })
-		end
-	end
+function M.get_current_factor()
+	return current_factor
 end
 
-function M.refresh()
-	cache_original()
+function M.set_factor(factor)
+	M.apply(factor)
 end
 
 return M
