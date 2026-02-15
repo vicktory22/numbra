@@ -1,10 +1,11 @@
-stds = {"vim", "lua"}
+std = "lua54"
 max_line_length = 150
 max_comment_line_length = 120
 
--- Module globals
-ignore = {"vim_", "_G"}
-allow_defined_top = true
+-- Neovim globals
+globals = {
+  "vim",
+}
 
 -- Check unused variables
 unused_name_secondaries = false

@@ -1,5 +1,4 @@
 local colors = require("numbra.colors")
-local config = require("numbra.config")
 
 local M = {}
 
