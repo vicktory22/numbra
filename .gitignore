@@ -18,3 +18,4 @@ site/
 # Test files
 tests/**/*.lua
 test/**/*.lua
+AGENTS.md
