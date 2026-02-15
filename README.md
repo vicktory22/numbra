@@ -1,11 +1,10 @@
 # Numbra
 
-A Neovim plugin that dynamically adjusts line number brightness to highlight the active window.
+A Neovim plugin that dynamically adjusts line number brightness using configurable darken and brighten factors.
 
 ## Features
 
-- Dim inactive windows' line numbers automatically
-- Brighten current window's line numbers
+- Increase or decrease line number brightness
 - Works with all colorschemes (no hardcoded colors)
 - Lightweight and performant
 - Simple, unobtrusive
@@ -17,25 +16,11 @@ A Neovim plugin that dynamically adjusts line number brightness to highlight the
 
 ## Installation
 
-Using [packer.nvim](https://github.com/wbthomason/packer.nvim):
-
-```lua
-use({
-  "tvick/numbra",
-  config = function()
-    require("numbra").setup({
-      darken_factor = 0.5,
-      brighten_factor = 0,
-    })
-  end
-})
-```
-
 Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
-  "tvick/numbra",
+  "vicktory22/numbra",
   config = function()
     require("numbra").setup({
       darken_factor = 0.5,
@@ -48,22 +33,22 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 Using [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-Plug 'tvick/numbra'
+Plug 'vicktory22/numbra'
 ```
 
 ## Usage
 
-After installation, the plugin will automatically adjust line number brightness based on window activity.
+After installation, the plugin will automatically adjust line number brightness based on configuration.
 
 ### Configuration
 
 ```lua
 require("numbra").setup({
-  -- Factor to darken inactive windows (0.0 to 1.0)
+  -- Factor to decrease brightness (0.0 to 1.0)
   -- 0.5 = 50% darker, 0.0 = no darkening
   darken_factor = 0.5,
 
-  -- Factor to brighten current window (0.0 to 2.0)
+  -- Factor to increase brightness (0.0 to 2.0)
   -- 1.0 = 100% brighter, 0.0 = no brightening
   brighten_factor = 0,
 })
@@ -73,8 +58,8 @@ require("numbra").setup({
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `darken_factor` | number | `0.5` | Brightness reduction for inactive windows (0-1) |
-| `brighten_factor` | number | `0` | Brightness increase for active window (0-2) |
+| `darken_factor` | number | `0.5` | Factor to decrease brightness (0-1) |
+| `brighten_factor` | number | `0` | Factor to increase brightness (0-2) |
 
 ### API
 
@@ -94,10 +79,9 @@ local enabled = require("numbra").is_enabled()
 
 ## How It Works
 
-1. Detects when you enter a window or gain focus
-2. Calculates the current line number highlight color
-3. Adjusts brightness using HSL color space
-4. Applies the new colors to LineNr and CursorLineNr groups
+1. Calculates the current line number highlight color
+2. Adjusts brightness using HSL color space
+3. Applies the new colors to LineNr and CursorLineNr groups
 
 ## Default Configuration
 
@@ -108,12 +92,12 @@ local enabled = require("numbra").is_enabled()
 }
 ```
 
-- **darken_factor**: Set to `0.5` to reduce line number brightness by 50% in inactive windows
-- **brighten_factor**: Set to `1.0` (or higher) to brighten the active window's line numbers
+- **darken_factor**: Set to `0.5` to reduce line number brightness by 50%
+- **brighten_factor**: Set to `1.0` (or higher) to brighten line numbers
 
 ## Examples
 
-### Dim inactive windows only
+### Decrease brightness only
 
 ```lua
 require("numbra").setup({
@@ -122,7 +106,7 @@ require("numbra").setup({
 })
 ```
 
-### Highlight active window
+### Increase brightness only
 
 ```lua
 require("numbra").setup({
@@ -131,7 +115,7 @@ require("numbra").setup({
 })
 ```
 
-### Both dim inactive and brighten active
+### Both decrease and increase brightness
 
 ```lua
 require("numbra").setup({
