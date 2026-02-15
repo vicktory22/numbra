@@ -8,11 +8,13 @@ local function hex_to_rgb(hex)
 	if #hex ~= 6 then
 		return nil
 	end
-	return {
-		r = tonumber(hex:sub(1, 2), 16),
-		g = tonumber(hex:sub(3, 4), 16),
-		b = tonumber(hex:sub(5, 6), 16),
-	}
+	local r = tonumber(hex:sub(1, 2), 16)
+	local g = tonumber(hex:sub(3, 4), 16)
+	local b = tonumber(hex:sub(5, 6), 16)
+	if not r or not g or not b then
+		return nil
+	end
+	return { r = r, g = g, b = b }
 end
 
 local function rgb_to_hex(r, g, b)

@@ -178,3 +178,17 @@ MIT License
 ## Contributing
 
 Contributions are welcome! Feel free to open issues or pull requests.
+
+## Testing
+
+Run the test suite:
+
+```bash
+cd tests
+./run_all.sh
+```
+
+Tests use luaunit and mock Neovim API calls to verify:
+- Link resolution for highlight groups (direct, single link, link chains, circular links)
+- Color caching and application
+- Brightness adjustment with various factors

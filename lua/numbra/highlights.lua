@@ -14,12 +14,24 @@ local function get_hl(group)
 	return hl
 end
 
-local function get_fg(group)
+local function get_fg(group, visited)
+	visited = visited or {}
+	if visited[group] then
+		return nil
+	end
+	visited[group] = true
+
 	local hl = get_hl(group)
 	if not hl then
 		return nil
 	end
-	return hl.fg
+	if hl.fg then
+		return hl.fg
+	end
+	if hl.link then
+		return get_fg(hl.link, visited)
+	end
+	return nil
 end
 
 function M.cache_original()
