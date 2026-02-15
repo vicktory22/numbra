@@ -1,0 +1,20 @@
+# Numbra Plugin Files
+*.lua~
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Neovim plugin directories
+doc/tags
+autoload/
+rplugin/
+site/
+
+# Lua workspace
+*.luac
+.luals/
+
+# Test files
+tests/**/*.lua
+test/**/*.lua
