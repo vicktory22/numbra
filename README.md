@@ -1,14 +1,13 @@
 # Numbra
 
-A Neovim plugin that allows manual adjustment of line number brightness through user commands.
+A Neovim plugin for adjusting line number brightness.
 
 ## Features
 
 - Manual control over line number brightness
-- Increase and decrease brightness with user commands
 - Works with all colorschemes (no hardcoded colors)
-- Lightweight and performant
-- Simple, unobtrusive
+- Supports `relativenumber` (LineNrAbove, LineNrBelow)
+- Lightweight and simple
 
 ## Requirements
 
@@ -22,31 +21,20 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 ```lua
 {
   "vicktory22/numbra",
-  config = function()
-    require("numbra").setup({
-      step = 0.05,
-      min_factor = 0.1,
-      max_factor = 3.0,
-    })
-  end,
+  config = true,
 }
 ```
 
 ## Usage
 
-After installation, use the provided commands to adjust line number brightness.
-
-### Commands
-
 ```vim
-:NumbraIncrease  " Increase brightness by step value
-:NumbraDecrease  " Decrease brightness by step value
+:NumbraIncrease  " Increase brightness
+:NumbraDecrease  " Decrease brightness
 :NumbraReset     " Reset to original brightness
+:NumbraDebug     " Show current state
 ```
 
-### Keymap Examples
-
-Add these to your Neovim configuration:
+### Keymaps
 
 ```lua
 vim.keymap.set("n", "<leader>li", ":NumbraIncrease<CR>")
@@ -54,141 +42,66 @@ vim.keymap.set("n", "<leader>ld", ":NumbraDecrease<CR>")
 vim.keymap.set("n", "<leader>lr", ":NumbraReset<CR>")
 ```
 
-### Configuration
-
-```lua
-require("numbra").setup({
-  -- Initial brightness factor (1.0 = original colors)
-  factor = 1.0,
-
-  -- Step size for increase/decrease commands (0.05 = 5%)
-  step = 0.05,
-
-  -- Minimum brightness factor (0.1 = 10% brightness)
-  min_factor = 0.1,
-
-  -- Maximum brightness factor (3.0 = 300% brightness)
-  max_factor = 3.0,
-})
-```
-
-### Configuration Options
-
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `factor` | number | `1.0` | Initial brightness (1.0 = original colors) |
-| `step` | number | `0.05` | Brightness change per command (0.05 = 5%) |
-| `min_factor` | number | `0.1` | Minimum allowed brightness (10%) |
-| `max_factor` | number | `3.0` | Maximum allowed brightness (300%) |
-
 ### API
 
 ```lua
--- Increase brightness
 require("numbra").increase()
-
--- Decrease brightness
 require("numbra").decrease()
-
--- Reset to original brightness
 require("numbra").reset()
-
--- Get current brightness factor
-local factor = require("numbra").get_factor()
-
--- Set brightness factor directly
 require("numbra").set_factor(1.5)
+require("numbra").get_factor()
 ```
 
-## How It Works
-
-1. Caches original line number highlight colors from your colorscheme
-2. When you increase/decrease brightness, adjusts lightness using HSL color space
-3. Applies the new colors to LineNr and CursorLineNr groups
-4. Resetting restores the original colors
-
-## Default Configuration
-
-```lua
-{
-  factor = 1.0,      -- Start with original brightness
-  step = 0.05,       -- 5% change per command
-  min_factor = 0.1,   -- 10% minimum
-  max_factor = 3.0,   -- 300% maximum
-}
-```
-
-## Examples
-
-### Fine-grained control (1% steps)
+## Configuration
 
 ```lua
 require("numbra").setup({
-  step = 0.01,
-  min_factor = 0.05,
-  max_factor = 5.0,
+  factor = 1.0,       -- Initial brightness (1.0 = original)
+  step = 0.2,         -- Change per command
+  min_factor = 0.1,   -- Minimum brightness
+  max_factor = 3.0,   -- Maximum brightness
+  cache_delay = 100,  -- Delay before caching colors (ms)
 })
 ```
 
-### Large adjustments (10% steps)
-
-```lua
-require("numbra").setup({
-  step = 0.1,
-  min_factor = 0.2,
-  max_factor = 2.0,
-})
-```
-
-### Dimmer by default
-
-```lua
-require("numbra").setup({
-  factor = 0.8,  -- Start at 80% brightness
-  step = 0.05,
-})
-```
+| Option | Default | Description |
+|--------|---------|-------------|
+| `factor` | `1.0` | Initial brightness factor |
+| `step` | `0.2` | Brightness change per command |
+| `min_factor` | `0.1` | Minimum allowed factor |
+| `max_factor` | `3.0` | Maximum allowed factor |
+| `cache_delay` | `100` | Delay before caching colors after colorscheme loads |
 
 ## Troubleshooting
 
-### Line numbers don't change color
+### Line numbers don't change
 
-Make sure `termguicolors` is enabled:
+Ensure `termguicolors` is enabled:
 
 ```lua
 vim.o.termguicolors = true
 ```
 
-### Plugin not working in some colorschemes
+### Plugin doesn't work with TokyoNight
 
-This plugin works with any colorscheme that provides foreground colors. If you experience issues:
+Increase the cache delay:
 
-1. Check your Neovim logs for errors
-2. Ensure your colorscheme supports line number highlights
-3. Try resetting with `:NumbraReset`
+```lua
+require("numbra").setup({
+  cache_delay = 300,
+})
+```
 
-### Brightness not changing
+### Debug
 
-Check current factor with `:lua print(require("numbra").get_factor())` - should return a number between your min and max values.
+Run `:NumbraDebug` to see cached and current colors.
+
+## How It Works
+
+1. Caches original line number highlight colors
+2. Adjusts brightness by interpolating toward white (factor > 1) or black (factor < 1)
+3. Applies to LineNr, CursorLineNr, LineNrAbove, and LineNrBelow
 
 ## License
 
-MIT License
-
-## Contributing
-
-Contributions are welcome! Feel free to open issues or pull requests.
-
-## Testing
-
-Run the test suite:
-
-```bash
-cd tests
-./run_all.sh
-```
-
-Tests use luaunit and mock Neovim API calls to verify:
-- Link resolution for highlight groups (direct, single link, link chains, circular links)
-- Color caching and application
-- Brightness adjustment with various factors
+MIT
