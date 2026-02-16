@@ -3,7 +3,7 @@ local lu = require("luaunit")
 
 local highlights = require("numbra.highlights")
 
-local function setup_mocks()
+	local function setup_mocks()
 	local mock_get_hl = {}
 	local mock_set_hl = {}
 
@@ -11,6 +11,16 @@ local function setup_mocks()
 		api = {
 			nvim_get_hl = function(_, opts)
 				local group = opts.name
+				if opts.link == false then
+					local visited = {}
+					while mock_get_hl[group] and mock_get_hl[group].link do
+						if visited[group] then
+							return nil
+						end
+						visited[group] = true
+						group = mock_get_hl[group].link
+					end
+				end
 				if mock_get_hl[group] then
 					return mock_get_hl[group]
 				end
