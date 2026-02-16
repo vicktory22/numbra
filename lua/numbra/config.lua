@@ -2,9 +2,10 @@ local M = {}
 
 local defaults = {
 	factor = 1.0,
-	step = 0.05,
+	step = 0.2,
 	min_factor = 0.1,
 	max_factor = 3.0,
+	cache_delay = 100,
 }
 
 M.config = {}
